@@ -373,8 +373,8 @@
 <th>Nombre de tâches ou actions à réaliser</th>
 <th>Nombre de tâches ou actions réalisées à 100%</th>
 <th>Taux d'avancement</th>
-<th>Statut du constat</th>
-<th>Taux de réalisation / exécution</th></tr>
+<th>Taux de réalisation / exécution</th>
+<th>Statut du constat</th></tr>
 </thead>
 <tbody id="libelles-body">
 <!-- Rempli par JS -->
@@ -604,20 +604,33 @@
   }
 
   function ajouterColonne() {
-    const headers = document.getElementById('table-headers');
-    const th = document.createElement('th');
-    th.textContent = "Nouvelle colonne";
-    headers.insertBefore(th, headers.lastElementChild);
-    const rows = document.querySelectorAll("#tableau-body tr");
-    rows.forEach(row => {
-      const td = document.createElement('td');
-      td.contentEditable = true;
-      row.insertBefore(td, row.lastElementChild);
-    });
-    appliquerListesDeroulantes();
-    activerSyncAutoLibelles();
-    synchroniserLibellesVersSuivi();
+  const nom = prompt("Nom de la nouvelle colonne ?", "Nouvelle colonne");
+  if (!nom) return;
+  const largeur = prompt("Largeur en pixels ? (ex: 150)", "120");
+  const headers = document.getElementById('table-headers');
+  const th = document.createElement('th');
+  th.textContent = nom;
+  if (largeur && !isNaN(parseInt(largeur))) {
+    th.style.width = largeur + "px";
+    th.style.minWidth = largeur + "px";
+    th.style.maxWidth = largeur + "px";
   }
+  headers.insertBefore(th, headers.lastElementChild);
+  const rows = document.querySelectorAll("#tableau-body tr");
+  rows.forEach(row => {
+    const td = document.createElement('td');
+    td.contentEditable = true;
+    if (largeur && !isNaN(parseInt(largeur))) {
+      td.style.width = largeur + "px";
+      td.style.minWidth = largeur + "px";
+      td.style.maxWidth = largeur + "px";
+    }
+    row.insertBefore(td, row.lastElementChild);
+  });
+  appliquerListesDeroulantes();
+  activerSyncAutoLibelles();
+  synchroniserLibellesVersSuivi();
+}
 
   function supprimerColonne() {
     const headers = document.getElementById('table-headers');
@@ -632,24 +645,36 @@
     synchroniserLibellesVersSuivi();
   }
 
-  function ajouterColonneAvecPosition() {
-    const position = prompt("À quelle position insérer la colonne ? (1 pour la première après #, 2, ...)", "");
-    const pos = parseInt(position);
-    const headers = document.getElementById('table-headers');
-    if(isNaN(pos) || pos<1 || pos>=headers.cells.length) return;
-    const th = document.createElement('th');
-    th.textContent = "Nouvelle colonne";
-    headers.insertBefore(th, headers.cells[pos]);
-    const rows = document.querySelectorAll("#tableau-body tr");
-    rows.forEach(row => {
-      const td = document.createElement('td');
-      td.contentEditable = true;
-      row.insertBefore(td, row.cells[pos]);
-    });
-    appliquerListesDeroulantes();
-    activerSyncAutoLibelles();
-    synchroniserLibellesVersSuivi();
+ function ajouterColonneAvecPosition() {
+  const position = prompt("À quelle position insérer la colonne ? (1 pour la première après #, 2, ...)", "");
+  const nom = prompt("Nom de la nouvelle colonne ?", "Nouvelle colonne");
+  const largeur = prompt("Largeur en pixels ? (ex: 150)", "120");
+  const pos = parseInt(position);
+  const headers = document.getElementById('table-headers');
+  if(isNaN(pos) || pos<1 || pos>=headers.cells.length) return;
+  const th = document.createElement('th');
+  th.textContent = nom;
+  if (largeur && !isNaN(parseInt(largeur))) {
+    th.style.width = largeur + "px";
+    th.style.minWidth = largeur + "px";
+    th.style.maxWidth = largeur + "px";
   }
+  headers.insertBefore(th, headers.cells[pos]);
+  const rows = document.querySelectorAll("#tableau-body tr");
+  rows.forEach(row => {
+    const td = document.createElement('td');
+    td.contentEditable = true;
+    if (largeur && !isNaN(parseInt(largeur))) {
+      td.style.width = largeur + "px";
+      td.style.minWidth = largeur + "px";
+      td.style.maxWidth = largeur + "px";
+    }
+    row.insertBefore(td, row.cells[pos]);
+  });
+  appliquerListesDeroulantes();
+  activerSyncAutoLibelles();
+  synchroniserLibellesVersSuivi();
+}
 
   function updateLibellesTab() {}
 
@@ -686,7 +711,7 @@
     NATURE_CATEGORIES.forEach(nature => {
       let total = 0, traite = 0, nontraite = 0, constatsTotal = [], constatsTraite = [], constatsNonTraite = [];
       Array.from(libellesBody.rows).forEach(row => {
-        const tdNature = row.cells[4], tdSituation = row.cells[3], tdStatut = row.cells[20]?.querySelector('select');
+        const tdNature = row.cells[4], tdSituation = row.cells[3], tdStatut = row.cells[21]?.querySelector('select');
         if (tdNature && tdNature.textContent.trim() === nature) {
           total++;
           const libelle = tdSituation ? tdSituation.textContent.trim() : "(vide)";
@@ -818,7 +843,7 @@ document.addEventListener('input', function () {
     const totalCell = row.cells[17];
     const doneCell = row.cells[18];
     const tauxCell = row.cells[19];
-    const tauxRealCell = row.cells[21];
+    const tauxRealCell = row.cells[20];
 
     const total = parseFloat(totalCell?.textContent.trim()) || 0;
     const done = parseFloat(doneCell?.textContent.trim()) || 0;
